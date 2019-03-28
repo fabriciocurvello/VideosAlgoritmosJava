@@ -17,10 +17,39 @@ public class MainActivity extends YouTubeBaseActivity implements YouTubePlayer.O
 
     private static final String GOOGLE_API_KEY = "AIzaSyDS4cJoieUrK9yLUo39hV9EAMSkwR1fvQw";
 
+    private YouTubePlayer.PlaybackEventListener playbackEventListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        playbackEventListener = new YouTubePlayer.PlaybackEventListener() {
+            @Override
+            public void onPlaying() {
+                Toast.makeText( MainActivity.this, "Vídeo executando", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPaused() {
+                Toast.makeText( MainActivity.this, "Vídeo pausado", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onStopped() {
+                Toast.makeText( MainActivity.this, "Vídeo parado (stop)", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onBuffering(boolean b) {
+                Toast.makeText( MainActivity.this, "Carregando o vídeo", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSeekTo(int i) {
+                Toast.makeText( MainActivity.this, "Movimentando o vídeo até o ponto " + i, Toast.LENGTH_SHORT).show();
+            }
+        };
 
         youTubePlayerView = findViewById(R.id.viewYouTubePlayer);
         youTubePlayerView.initialize(GOOGLE_API_KEY, this);
@@ -35,6 +64,10 @@ public class MainActivity extends YouTubeBaseActivity implements YouTubePlayer.O
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean foiRestaurado) {
         Toast.makeText(this, "Player inciado com sucesso!", Toast.LENGTH_SHORT).show();
+
+        //Associando o youTubePlayer ao Listener que captura as ações do usuário ao executar o player
+        //Todas as ações deste listener estão no onCreate()
+        youTubePlayer.setPlaybackEventListener( playbackEventListener );
 
         //TODO Observar que existe a opção loadPlaylist
 
@@ -53,6 +86,6 @@ public class MainActivity extends YouTubeBaseActivity implements YouTubePlayer.O
     //Define o que fazer quando o player NAO for iniciado corretamente
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-        Toast.makeText(this, "Erro ao iniciar o player!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Erro ao iniciar o player: " + youTubeInitializationResult.toString(), Toast.LENGTH_SHORT).show();
     }
 }
